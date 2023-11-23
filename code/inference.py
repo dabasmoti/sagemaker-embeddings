@@ -29,12 +29,11 @@ def transform_fn(model, input_data, content_type, accept):
     predict_func = partial(predict, model)
 
     if STRATEGY == 'MultiRecord':
-        #print(f'Input data: {type(io.StringIO(input_data))}')
         df = pd.read_csv(io.StringIO(input_data), sep=',', header=None)
         df.columns = [TEXT_COLUMN]
         ds = Dataset.from_pandas(df)
         ds = ds.map(predict_func, batched=True, batch_size=BATCH_SIZE)
-        return pd.DataFrame([[row[TEXT_COLUMN]] + row[PREDICTION_COLUMN] for row in ds])
+        return pd.DataFrame([[row[TEXT_COLUMN]] + row[PREDICTION_COLUMN] for row in ds]).to_csv(index=False, header=False)
 
     else:
         raise NotImplementedError(f"Strategy {STRATEGY} is not implemented")

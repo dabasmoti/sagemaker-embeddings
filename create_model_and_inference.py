@@ -1,10 +1,9 @@
 import sys
+import os
 import argparse
 from sagemaker.transformer import Transformer
 import boto3
-from debug.create_sagemaker_session
 
-role = "arn:aws:iam::834250429826:role/service-role/AmazonSageMaker-ExecutionRole-20231122T172883"
     
 def parse_args(args):
     """
@@ -39,6 +38,7 @@ def parse_args(args):
     parser.add_argument('--join_source', type=str, default='Input')
     parser.add_argument("--create_model", action="store_true")
     parser.add_argument("--serve", action="store_true")
+    parser.add_argument("--st_mode", type=str, default=None)
     return parser.parse_args()
 
 
@@ -50,13 +50,14 @@ def create_sagemaker_model(args):
     try:
         sm.create_model(
             ModelName=model_name,
-            ExecutionRoleArn=role,
+            ExecutionRoleArn=os.environ['SAGEMAKER_ROLE'],
             PrimaryContainer={
                 'Image': args.image_uri,
                 'ModelDataUrl': args.model_artifact_path,
                 'Environment': {
                     'BATCH_SIZE': str(args.batch_size),
                     'STRATEGY': args.strategy,
+                    'MODEL_NAME': args.model_name,
                     }
             }
         )
