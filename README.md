@@ -1,10 +1,15 @@
 
 Docker image uri:  
-cpu
-763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-cpu-py310-ubuntu20.04
-```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-cpu-py310-ubuntu20.04```
-GPU
-```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-gpu-py310-cu118-ubuntu20.04```
+CPU - ```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-cpu-py310-ubuntu20.04```
+
+GPU - ```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-gpu-py310-cu118-ubuntu20.04```
+
+*** you must create a dummy model.tar.gz in s3 bucket 
+```
+cd model_directory
+tar zcvf model.tar.gz *
+aws s3 cp model.tar.gz <s3://{my-s3-path}>
+```
 
 
 ### Serving or create model manually
