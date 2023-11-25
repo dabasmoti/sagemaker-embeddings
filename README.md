@@ -8,7 +8,7 @@ run
 
 ### For model creation and start `TransformJob` on GPU
 - default model is sentence-transformers/LaBSE
-to change the model send the sentence-transformers model full name - 'sentence-transformers/all-MiniLM-L6-v2'
+to change the model send - all-MiniLM-L6-v2
 use this commands:
 ```
 export MODEL_ARTIFACTS=s3://llama-weights-us/labse-model/model.tar.gz
