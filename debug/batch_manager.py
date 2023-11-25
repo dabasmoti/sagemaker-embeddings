@@ -5,6 +5,7 @@ from sagemaker.transformer import Transformer
 import boto3
 import sagemaker
 from sagemaker.local import LocalSession
+from sagemaker.pytorch import PyTorchModel
 
 
 def get_sagemaker_session(mode=None):
@@ -19,18 +20,17 @@ def get_sagemaker_session(mode=None):
 
 
 class BatchTransformManager:
-    def __init__(self, role, session=None):
+    def __init__(self, role):
         self.model_name = None
         self.model_path = None
         self.role = role
-        self.session = get_sagemaker_session(session)
+        self.session = None
 
     def create_model(
         self,
         model_name: str,
         model_path: str,
         environment_vars: dict = None,
-        transformers_version: str = "4.28.1",
         pytorch_version: str = "2.0.0",
         py_version: str = "py310",
         source_dir: str = "code",
@@ -41,13 +41,12 @@ class BatchTransformManager:
         self.model_path = model_path
         print("creating sagemaker model")
 
-        sagemaker_model = HuggingFaceModel(
-            # name=self.model_name,
+        sagemaker_model = PyTorchModel(
+            name=self.model_name,
             model_data=self.model_path,
             role=self.role,
             source_dir=source_dir,
-            transformers_version=transformers_version,
-            pytorch_version=pytorch_version,
+            framework_version=pytorch_version,
             py_version=py_version,
             entry_point=entry_point,
             env=environment_vars,
@@ -63,17 +62,19 @@ class BatchTransformManager:
         input_path: str = None,
         output_path: str = None,
         instance_count: int = 1,
-        instance_type: str = "local",
+        instance_type: str = "ml.g4dn.xlarge",
         strategy: str = "MultiRecord",
         accept: str = "text/csv",
         split_type: str = "Line",
         envs: dict = None,
     ):
+        
+        self.session = get_sagemaker_session(instance_type)
         sage_maker_model = self.create_model(
             model_name=model_name, 
             model_path=model_path, 
             sagemaker_session=self.session,
-            environment_vars=envs
+            environment_vars=envs,
         )
 
         transformer = sage_maker_model.transformer(
@@ -96,11 +97,12 @@ if __name__ == "__main__":
     import os
     sgm = BatchTransformManager(
         role=os.environ.get("SAGEMAKER_ROLE"),
-        session="local",
     )
+    print("role",os.environ.get("SAGEMAKER_ROLE"))
     sgm.run_batch_job(
         model_path="s3://llama-weights-us/dummy-model/model.tar.gz",
         input_path="s3://llama-weights-us/input_data/",
         envs={"MODEL_NAME": "all-MiniLM-L12-v2"},
+        instance_type='local'
     )
     

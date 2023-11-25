@@ -1,17 +1,3 @@
-
-Docker image uri:  
-CPU - ```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-cpu-py310-ubuntu20.04```
-
-GPU - ```763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-gpu-py310-cu118-ubuntu20.04```
-
-*** you must create a dummy model.tar.gz in s3 bucket 
-```
-cd model_directory
-tar zcvf model.tar.gz *
-aws s3 cp model.tar.gz <s3://{my-s3-path}>
-```
-
-
 ### Serving or create model manually
 you can create model and start batch transform job in one command.  
 ### Run Locally
@@ -25,11 +11,10 @@ run
 to change the model send the sentence-transformers model full name - 'sentence-transformers/all-MiniLM-L6-v2'
 use this commands:
 ```
-export IMAGE_URI=763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-inference:2.0.0-transformers4.28.1-gpu-py310-cu118-ubuntu20.04
 export MODEL_ARTIFACTS=s3://llama-weights-us/labse-model/model.tar.gz
 
-python create_model_and_inference.py --model_name labse-model \
---image_uri $IMAGE_URI \
+python create_model_and_inference.py \
+--sg_model_name all-mini \ 
 --model_artifact_path $MODEL_ARTIFACTS \
 --batch_size 64 \
 --strategy MultiRecord \
@@ -37,14 +22,15 @@ python create_model_and_inference.py --model_name labse-model \
 --instance_type  ml.g4dn.xlarge  \
 --input_data s3://llama-weights-us/input_data/ \
 --output_data s3://llama-weights-us/output_data/ \
+--st_model all-MiniLM-L12-v2 \
 --serve 
 ```
-This command will create model name with args combination and transform job.  
-`labse-model-64-MultiRecord-csv`
+
 
 ### For creating batch transform job manully use this command:
 ```
-python create_model_and_inference.py --model_name labse-model-64-MultiRecord-csv \
+python create_model_and_inference.py \
+--model_name all-mini \
 --input_data s3://llama-weights-us/input_data/  \
 --output_data s3://llama-weights-us/output_data/ \
 --serve

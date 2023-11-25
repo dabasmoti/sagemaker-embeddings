@@ -33,6 +33,8 @@ def transform_fn(model, input_data, content_type, accept):
         df.columns = [TEXT_COLUMN]
         ds = Dataset.from_pandas(df)
         ds = ds.map(predict_func, batched=True, batch_size=BATCH_SIZE)
+        # done predictions
+        print(f'Predictions on {len(df)} samples')
         return pd.DataFrame([[row[TEXT_COLUMN]] + row[PREDICTION_COLUMN] for row in ds]).to_csv(index=False, header=False)
 
     else:
